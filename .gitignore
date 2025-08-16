@@ -1,0 +1,22 @@
+# Python-generated files
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Other 
+*.env
+.idea/
+.vscode/
+*.sqlite3
+*__pycache__/
+backend/db_data
+
+# Media files
+backend/media/product/*
+!backend/media/product/product.png
+*.msi
