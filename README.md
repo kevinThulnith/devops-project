@@ -1,7 +1,4 @@
-re# Live Reloading Inventory Management System (LR 3.0)
-
-[![Python IDLE](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff)](#)
-[![Django](https://img.shields.io/badge/Django-%23092E20.svg?logo=django&logoColor=white)](#)
+![Django](https://img.shields.io/badge/Django-%23092E20.svg?logo=django&logoColor=white)
 ![DRF](https://img.shields.io/badge/Django_REST-FF1709?logo=django&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-000000?logo=JSON%20web%20tokens)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?logo=postgresql&logoColor=white)
@@ -12,29 +9,177 @@ re# Live Reloading Inventory Management System (LR 3.0)
 ![Axios](https://img.shields.io/badge/Axios-5A29E4?logo=axios&logoColor=white)
 [![NodeJS](https://img.shields.io/badge/Node.js-6DA55F?logo=node.js&logoColor=white)](#)
 ![npm](https://img.shields.io/badge/npm-CB3837?logo=npm&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-009639?logo=nginx&logoColor=white)
 
-A full-stack, real-time inventory management system with live product updates via WebSockets and modern authentication.
+# DevOps Project - Live Reloading Inventory Management System
+
+The project includes a complete Docker Compose setup for easy deployment and development with version 3.0 configuration | Websocker | Live reloading.
+
+## 🚀 Quick Docker Setup
+
+1. **📋 Prerequisites**:
+
+   - Docker Engine 20.0+
+   - Docker Compose 3.0+
+
+2. **⚙️ Environment Configuration**:
+
+   Create a `.env.prod` file in the project root:
+
+   ```env
+   # Database Configuration
+   POSTGRES_DB=devops_inventory
+   POSTGRES_USER=devops_user
+   POSTGRES_PASSWORD=your_secure_password
+   DATABASE_URL=postgresql://devops_user:your_secure_password@lr-database:5432/devops_inventory
+
+   # Django Configuration
+   DEBUG=False
+   DJANGO_SECRET_KEY=your-super-secret-key-here
+   ALLOWED_HOSTS=localhost,127.0.0.1,lr-backend
+
+   # Redis Configuration
+   REDIS_HOST=lr-redis
+   REDIS_PORT=6379
+   ```
+
+3. **🏃‍♂️ Start All Services**:
+
+   ```powershell
+   docker-compose up -d
+   ```
+
+4. **📊 Check Service Status**:
+
+   ```powershell
+   docker-compose ps
+   ```
+
+5. **📝 Run Database Migrations**:
+
+   ```powershell
+   docker-compose exec lr-backend python manage.py migrate
+   ```
+
+6. **👤 Create Superuser**:
+
+   ```powershell
+   docker-compose exec lr-backend python manage.py createsuperuser
+   ```
+
+7. **📦 Populate Sample Data**:
+
+   ```powershell
+   docker-compose exec lr-backend python manage.py populate_products --count 40
+   ```
+
+### 🌐 Service Access Points
+
+- **Frontend Application**: <http://localhost> (via Nginx proxy)
+- **Backend API**: <http://localhost/api/> (via Nginx proxy)
+- **Django Admin**: <http://localhost/admin/> (via Nginx proxy)
+- **PostgreSQL Database**: localhost:5432
+- **Redis Cache**: localhost:6379
+
+### 🔧 Docker Services Overview
+
+| Service         | Description              | Image/Build              | Ports     | Dependencies      |
+| --------------- | ------------------------ | ------------------------ | --------- | ----------------- |
+| **lr-proxy**    | 🌐 Nginx reverse proxy   | `nginx:1.25-alpine-slim` | 80:80     | frontend, backend |
+| **lr-frontend** | ⚛️ React application     | Custom build             | 5173:5173 | -                 |
+| **lr-backend**  | 🐍 Django API server     | Custom build             | 8000:8000 | database, redis   |
+| **lr-database** | 🐘 PostgreSQL database   | `postgres:14-alpine`     | 5432:5432 | -                 |
+| **lr-redis**    | 🧠 Redis cache & pub/sub | `redis:7-alpine`         | 6379:6379 | -                 |
+
+### 📁 Required Docker Files
+
+Make sure you have these Dockerfiles in their respective directories:
+
+**Backend Dockerfile** (`backend/Dockerfile`):
+
+```dockerfile
+FROM python:3.13-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+
+EXPOSE 8000
+
+CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "backend.asgi:application"]
+```
+
+**Frontend Dockerfile** (`frontend/Dockerfile`):
+
+```dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 5173
+
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+```
+
+### 🛠️ Docker Management Commands
+
+```powershell
+   # Start all services
+   docker-compose up -d
+
+   # Stop all services
+   docker-compose down
+
+   # View logs
+   docker-compose logs -f [service-name]
+
+   # Rebuild and restart a service
+   docker-compose up -d --build [service-name]
+
+   # Execute commands in containers
+   docker-compose exec lr-backend python manage.py [command]
+   docker-compose exec lr-frontend npm [command]
+
+   # Clean up unused Docker resources
+   docker system prune -a
+```
+
+A full-stack, real-time inventory management system with live product updates via WebSockets, modern authentication, and complete Docker containerization for DevOps deployment.
 
 ## 🏗️ System Architecture
 
 ```mermaid
-graph LR
-    User[👤 User] --> Frontend[💻 React App]
-    Frontend --> API[🌐 Django API]
-    Frontend -.-> WS[📡 WebSocket]
+graph TB
+   subgraph "🐳 Docker Environment"
+      Proxy[🛡️ Nginx Proxy<br/>Port 80]
+      Frontend[⚛️ React App<br/>Port 5173]
+      Backend[🐍 Django Backend<br/>Port 8000]
+      Database[(🐘 PostgreSQL Database<br/>Port 5432)]
+      Redis[(🧠 Redis Pub/Sub<br/>Port 6379)]
+   end
 
-    API --> Backend[⚙️ Django Backend]
-    Backend --> DB[(🗄️ PostgreSQL Database)]
-    WS --> Redis[(🧠 Redis Pub/Sub)]
+   User[👤 User] --> Proxy
+   Proxy --> Frontend
+   Proxy --> Backend
+   Frontend -.-> WS[📡 WebSocket]
+   Backend --> Database
+   WS --> Redis
+   Backend -.-> Redis
 
-    API -.-> Redis
-    Redis -.-> WS
-
-    style Frontend fill:#00008B,color:#fff
-    style API fill:#092E20,color:#fff
-    style Backend fill:#092E20,color:#fff
-    style DB fill:#336791,color:#fff
-    style Redis fill:#DC382D,color:#fff
+   style Frontend fill:#00008B,color:#fff
+   style Backend fill:#092E20,color:#fff
+   style Database fill:#336791,color:#fff
+   style Redis fill:#DC382D,color:#fff
+   style Proxy fill:#009639,color:#fff
 ```
 
 ## 📊 Data Flow
@@ -102,6 +247,17 @@ flowchart TD
 - **🖼️ Image Handling**: Product image uploads with media file management
 - **🌐 CORS Support**: Configured for cross-origin frontend-backend communication
 
+### 🐳 DevOps Features
+
+- **🐳 Full Docker Containerization**: Complete multi-container setup with Docker Compose 3.0
+- **🌐 Nginx Reverse Proxy**: Load balancing and SSL termination ready
+- **📦 Multi-stage Builds**: Optimized Docker images for production deployment
+- **🔧 Environment Configuration**: Separate configurations for development and production
+- **📊 Service Orchestration**: Automated service dependency management
+- **💾 Persistent Data Volumes**: Configured volumes for database and Redis data persistence
+- **🔄 Health Checks**: Container health monitoring and automatic restarts
+- **🌍 Network Isolation**: Secure inter-service communication via Docker networks
+
 ## 🛠️ Tech Stack
 
 ### 🐍 Backend
@@ -126,15 +282,30 @@ flowchart TD
 
 ### 🗄️ Database & Infrastructure
 
-- **PostgreSQL** (default) or **SQLite** - 📊 Database
-- **Redis** - 📡 WebSocket channel layer
+- **PostgreSQL** (production) or **SQLite** (development) - 📊 Database
+- **Redis** - 📡 WebSocket channel layer & caching
 - **WhiteNoise** - 📁 Static file serving
 
+### 🐳 DevOps & Deployment
+
+- **Docker** - 🐳 Containerization platform
+- **Docker Compose 3.0** - 🔧 Multi-container orchestration
+- **Nginx** - 🌐 Reverse proxy and load balancer
+- **Alpine Linux** - 🏔️ Lightweight container base images
+
 ## 📋 Prerequisites
+
+### For Development (Local Setup)
 
 - **🐍 Python 3.13+**
 - **🟢 Node.js 16+** and npm
 - **🔴 Redis server** (for WebSocket channel layer)
+- **📝 Git**
+
+### For Docker Deployment
+
+- **🐳 Docker Engine 20.0+**
+- **🔧 Docker Compose 3.0+**
 - **📝 Git**
 
 ## � Docker Deployment
@@ -161,7 +332,7 @@ This will spin up all containers and services automatically with proper networki
 ### 1️⃣ Clone the Repository
 
 ```powershell
-git clone https://github.com/kevinThulnith/live-reloading-inventory-management-system.git
+git clone https://github.com/kevinThulnith/devops-project.git
 cd live-reloading-inventory-management-system
 ```
 
