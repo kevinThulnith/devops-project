@@ -170,6 +170,7 @@ graph TB
    User[👤 User] --> Proxy
    Proxy --> Frontend
    Proxy --> Backend
+   Frontend --> Backend
    Frontend -.-> WS[📡 WebSocket]
    Backend --> Database
    WS --> Redis
