@@ -70,5 +70,3 @@ networks:
 volumes:
   lr-db-data:
   lr-redis-data:
-  lr-static-content:
-  lr-frontend-build:
