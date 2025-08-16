@@ -10,11 +10,11 @@ wheels/
 
 # Other 
 *.env
+*.env.*
 .idea/
 .vscode/
 *.sqlite3
 *__pycache__/
-backend/db_data
 
 # Media files
 backend/media/product/*
