@@ -7,8 +7,7 @@ RUN npm ci --prefer-offline --no-audit --no-fund --silent
 
 COPY . .
 
-ENV VITE_API_URL=http://localhost:8000
-ENV VITE_WS_URL=ws://localhost:8000
+ENV NODE_ENV=production
 
 RUN npm run build
 

@@ -42,9 +42,8 @@ function Home() {
     }
 
     // TODO: Create WebSocket URL
-    const socketUrl = `${
-      import.meta.env.VITE_WS_URL
-    }/ws/products/?token=${token}`;
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const socketUrl = `${protocol}//${window.location.host}/ws/products/?token=${token}`;
     const socket = new WebSocket(socketUrl);
 
     // TODO: Handle WebSocket events
