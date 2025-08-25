@@ -7,7 +7,7 @@ from .models import Product
 
 
 # This decorator means the `product_change_handler` function
-# will be called every time a Product instance is saved or deleted.
+# will be called every time a Product instance is saved or deleted.hello
 @receiver([post_save, post_delete], sender=Product)
 def product_change_handler(sender, instance, **kwargs):
     """s
