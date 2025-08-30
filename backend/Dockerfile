@@ -1,10 +1,6 @@
 # Stage 1: Base build stage
 FROM python:3.12-alpine AS builder
- 
-# Create the app directory
-RUN mkdir /app
- 
-# Set the working directory
+
 WORKDIR /app
  
 # Set environment variables to optimize Python
